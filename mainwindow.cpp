@@ -4,21 +4,26 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_pGame(new Game(0, 4))
+    m_pGame(NULL)
 {
     ui->setupUi(this);
-    startGame();
 }
 
 MainWindow::~MainWindow()
 {
-    delete m_pGame;
+    if(m_pGame)
+        delete m_pGame;
     delete ui;
 }
 
 void MainWindow::startGame()
 {
-    m_pGame->playBestPlay();
+    if(m_pGame)
+        delete m_pGame;
+    m_pGame = new Game(!ui->checkBox->isChecked(),
+                       ui->spinBox_3->value());
+    if(ui->checkBox->isChecked())
+        m_pGame->playBestPlay();
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -27,4 +32,9 @@ void MainWindow::on_pushButton_clicked()
                    ui->spinBox_2->value());
     m_pGame->play(__tmp);
     m_pGame->playBestPlay();
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    startGame();
 }
