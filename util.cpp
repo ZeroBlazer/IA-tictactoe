@@ -112,8 +112,8 @@ void Table::availablePositions(vector<Position> &_pos)
 {
     _pos.clear();
     Position tmp;
-    for(int i = 0; i < m_size; ++i) {
-        for(int j = 0; j < m_size; ++j) {
+    for(size_t i = 0; i < m_size; ++i) {
+        for(size_t j = 0; j < m_size; ++j) {
             if(m_table[i * m_size + j] == unplayed) {
                 tmp.y = i;
                 tmp.x = j;
