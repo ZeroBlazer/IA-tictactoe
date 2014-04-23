@@ -160,12 +160,10 @@ void Game::play(Position &_pos)
 
 Position& Game::bestPlay()
 {
-//  Crear Árbol
+//    GameTree __gameTree(m_gameTable);
+//    return __gameTree.minMax();
 
-//  Correr función maxmin
-
-//  Recuperar posición
-    //Posición al azar
+//Posición al azar
         vector<Position> pos;
         m_gameTable.availablePositions(pos);
         return pos[rand() % pos.size()];
@@ -261,4 +259,9 @@ GameTree::~GameTree()
 void GameTree::build(size_t _level)
 {
     m_root->buildTree(_level);
+}
+
+Position GameTree::minMax()
+{
+
 }

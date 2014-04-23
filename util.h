@@ -60,6 +60,7 @@ public:
     GameTree(Table &_root);
     ~GameTree();
     void build(size_t _level);
+    Position minMax();
 private:
     GameTreeNode *m_root;
 };
