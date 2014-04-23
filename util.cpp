@@ -66,12 +66,12 @@ void Table::check(size_t &_w1, size_t &_w2)
     }
     //Verificar filas completas
     for(size_t j = 0; j < m_size; ++j) {
-        if(m_table[j] != unplayed) {
+        if(m_table[j*m_size] != unplayed) {
             for(size_t i = 0; i < m_size; ++i) {
-                if(m_table[j*m_size + i] != m_table[j])
+                if(m_table[j*m_size + i] != m_table[j*m_size])
                     break;
                 if(i == m_size-1) {
-                    if(m_table[j] == played_me)
+                    if(m_table[j*m_size] == played_me)
                         ++_w1;
                     else
                         ++_w2;
