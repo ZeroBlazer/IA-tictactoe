@@ -17,7 +17,7 @@ struct Position {
             y;
     Position(size_t _x = 0, size_t _y = 0);
     Position (const Position &_other);
-    Position operator =(Position &_other);
+    Position operator =(const Position &_other);
 
     void print();   //SÓLO POR FINES DEMOSTRATIVOS
 };
@@ -39,6 +39,29 @@ private:
     bool m_turn;    //Indicador del jugador al que le corresponde el turno (0: yo, 1: oponente)
     size_t m_size;
     vector<status> m_table;
+};
+
+class GameTreeNode {
+public:
+    GameTreeNode(Table &_table, bool _minMax = true);
+    ~GameTreeNode();
+    void buildTree(size_t _level);
+    void playPosition(Position &_pos);
+private:
+    Table *m_table;
+    vector<Position> m_positions;
+    vector<GameTreeNode> m_children;
+    int m_weight;
+    bool m_minmax_bool; //True -> Max, False -> Min
+};
+
+class GameTree {
+public:
+    GameTree(Table &_root);
+    ~GameTree();
+    void build(size_t _level);
+private:
+    GameTreeNode *m_root;
 };
 
 class Game {

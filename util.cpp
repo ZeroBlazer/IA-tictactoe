@@ -10,7 +10,7 @@ Position::Position(const Position &_other) :
     y(_other.y)
 {}
 
-Position Position::operator =(Position &_other)
+Position Position::operator =(const Position &_other)
 {
     x = _other.x;
     y = _other.y;
@@ -155,8 +155,7 @@ void Game::play(Position &_pos)
         break;
     }
     cout << endl;
-
-    //*********************************************************//
+//*********************************************************//
 }
 
 Position& Game::bestPlay()
@@ -210,4 +209,56 @@ void Game::draw()
         }
         cout << endl;
     }
+}
+
+GameTreeNode::GameTreeNode(Table &_table, bool _minMax) :
+    m_table(0),
+    m_weight(0),
+    m_minmax_bool(_minMax)
+{
+    m_table = new Table(_table);
+}
+
+GameTreeNode::~GameTreeNode()
+{
+    if(m_table)
+        delete m_table;
+}
+
+void GameTreeNode::buildTree(size_t _level)
+{
+    if(_level > 0) {
+        m_table->availablePositions(m_positions);
+        vector<Position>::iterator  it1 = m_positions.begin(),
+                                    it2 = m_positions.end();
+        for(; it1 != it2; ++it1) {
+            GameTreeNode tmp(*m_table, !m_minmax_bool);
+            tmp.playPosition(*it1);
+            tmp.buildTree(--_level);
+            m_children.push_back(tmp);
+        }
+    }
+    if(_level == 0)
+        m_weight = m_table->weight();
+    delete m_table;
+}
+
+void GameTreeNode::playPosition(Position &_pos)
+{
+    m_table->marcar(_pos);
+}
+
+GameTree::GameTree(Table &_root) :
+    m_root(new GameTreeNode(_root))
+{}
+
+GameTree::~GameTree()
+{
+    if(m_root)
+        delete m_root;
+}
+
+void GameTree::build(size_t _level)
+{
+    m_root->buildTree(_level);
 }
