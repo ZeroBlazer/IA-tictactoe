@@ -123,11 +123,18 @@ void Table::availablePositions(vector<Position> &_pos)
     }
 }
 
+int Table::weight()
+{
+    size_t w1, w2;
+    check(w1, w2);
+    return w1-w2;
+}
+
 Game::Game(bool _start_me, size_t _n) :
     m_gameTable(_start_me,_n)
 {}
 
-void Game::play(Position _pos)
+void Game::play(Position &_pos)
 {
     if(_pos.x < m_gameTable.m_size && _pos.y < m_gameTable.m_size)
         m_gameTable.marcar(_pos);
@@ -149,7 +156,25 @@ void Game::play(Position _pos)
     }
     cout << endl;
 
-//*********************************************************//
+    //*********************************************************//
+}
+
+Position& Game::bestPlay()
+{
+//  Crear Árbol
+
+//  Correr función maxmin
+
+//  Recuperar posición
+    //Posición al azar
+        vector<Position> pos;
+        m_gameTable.availablePositions(pos);
+        return pos[rand() % pos.size()];
+}
+
+void Game::playBestPlay()
+{
+    play(bestPlay());
 }
 
 status Game::checkWinner()

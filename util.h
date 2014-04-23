@@ -2,6 +2,7 @@
 #define UTIL_H
 
 #include <vector>
+#include <cstdlib>
 #include <iostream>
 using namespace std;
 
@@ -32,6 +33,7 @@ public:
     bool marcar(Position _pt);   //True si la casilla estaba libre
     void check(size_t &_w1, size_t &_w2);   //nRaya completos: _w1 -> míos, _w2 -> oponente
     void availablePositions(vector<Position> &_pos); //_pos se vacía y se llena con posiciones disponibles
+    int weight();
 
 private:
     bool m_turn;    //Indicador del jugador al que le corresponde el turno (0: yo, 1: oponente)
@@ -42,7 +44,9 @@ private:
 class Game {
 public:
     Game(bool _start_me = 0, size_t _n = 3);
-    void play(Position _pos);
+    void play(Position &_pos);
+    Position &bestPlay();
+    void playBestPlay();
     status checkWinner(); //Debe retornar status, por lo pronto mostrar en consola
     void draw();
 
