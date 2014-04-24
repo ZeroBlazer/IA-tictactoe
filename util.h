@@ -47,6 +47,8 @@ public:
     ~GameTreeNode();
     void buildTree(size_t _level);
     void playPosition(Position &_pos);
+    Position &getPositionAt(size_t _pos);
+    size_t getMaxMin(); //Devuelve la posición con mayor/menor valor
 private:
     Table *m_table;
     vector<Position> m_positions;

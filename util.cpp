@@ -236,7 +236,7 @@ void GameTreeNode::buildTree(size_t _level)
             m_children.push_back(tmp);
         }
     }
-    if(_level == 0)
+    if(_level == 0 || m_positions.empty())  //Alcanzó la profundidad deseada o ya no hay movimientos posibles
         m_weight = m_table->weight();
     delete m_table;
 }
@@ -244,6 +244,41 @@ void GameTreeNode::buildTree(size_t _level)
 void GameTreeNode::playPosition(Position &_pos)
 {
     m_table->marcar(_pos);
+}
+
+Position &GameTreeNode::getPositionAt(size_t _pos)
+{
+    if(_pos < m_positions.size())
+        return m_positions[_pos];
+    return m_positions[0];  //MEJOR LANZAR EXCEPCIÓN
+}
+
+size_t GameTreeNode::getMaxMin()
+{
+    if(m_children.empty())  //Retorna su peso si es que el nodo ya no tiene hijos
+        return 0;   //******PUEDE CAUSAR PROBLEMAS SI EL NIVEL DEL ÁRBOL ES 0******//
+    m_children[0].getMaxMin();
+    int     tmp0 = m_children[0].m_weight,   //Almacena el mayor/menor valor
+            tmp1;
+    size_t pos = 0;
+    for(size_t i = 1; i < m_children.size(); ++i) {
+        m_children[i].getMaxMin();
+        tmp1 = m_children[i].m_weight;
+        if(m_minmax_bool) {
+            if(tmp1 > tmp0) {
+                tmp0 = tmp1;
+                pos = i;
+            }
+        }
+        else {
+            if(tmp1 < tmp0) {
+                tmp0 = tmp1;
+                pos = i;
+            }
+        }
+    }
+    m_weight = tmp0;
+    return pos;
 }
 
 GameTree::GameTree(Table &_root) :
@@ -263,5 +298,5 @@ void GameTree::build(size_t _level)
 
 Position GameTree::minMax()
 {
-
+    return m_root->getPositionAt(m_root->getMaxMin());
 }
