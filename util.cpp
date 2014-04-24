@@ -79,7 +79,7 @@ void Table::check(size_t &_w1, size_t &_w2)
             }
         }
     }
-    //Verificar diagonales
+    //Verificar primera diagonal
     if(m_table[0] != unplayed) {
         for(size_t i = 1; i < m_size; ++i){
             if(m_table[i*m_size+i] != m_table[0])
@@ -92,17 +92,17 @@ void Table::check(size_t &_w1, size_t &_w2)
             }
         }
     }
-    else {
-        if(m_table[m_size-1] != unplayed) {
-            for(size_t i = 1; i < m_size; ++i) {
-                if(m_table[i*m_size + m_size-i-1] != m_table[m_size-1])
-                    break;
-                if(i == m_size-1) {
-                    if(m_table[m_size-1] == played_me)
-                        ++_w1;
-                    else
-                        ++_w2;
-                }
+    //Verificar segunda diagonal
+    size_t _edge = m_size-1;
+    if(m_table[_edge] != unplayed) {
+        for(size_t i = 1; i < m_size; ++i) {
+            if(m_table[i*m_size + _edge-i] != m_table[_edge])
+                break;
+            if(i == _edge) {
+                if(m_table[_edge] == played_me)
+                    ++_w1;
+                else
+                    ++_w2;
             }
         }
     }
@@ -161,9 +161,10 @@ void Game::play(Position &_pos)
 Position& Game::bestPlay()
 {
 //    GameTree __gameTree(m_gameTable);
+//    __gameTree.build(1);
 //    return __gameTree.minMax();
 
-//Posición al azar
+////Posición al azar
         vector<Position> pos;
         m_gameTable.availablePositions(pos);
         return pos[rand() % pos.size()];
@@ -225,19 +226,19 @@ GameTreeNode::~GameTreeNode()
 
 void GameTreeNode::buildTree(size_t _level)
 {
+    m_table->availablePositions(m_positions);
+    if(_level == 0 || m_positions.empty())  //Alcanzó la profundidad deseada o ya no hay movimientos posibles
+        if(m_positions.empty())
+            cout << "No más movimientos disponibles" << endl; ////*********DEBUG*********////
+        m_weight = m_table->weight();
     if(_level > 0) {
-        m_table->availablePositions(m_positions);
-        vector<Position>::iterator  it1 = m_positions.begin(),
-                                    it2 = m_positions.end();
-        for(; it1 != it2; ++it1) {
+        for(size_t i = 0; i < m_positions.size(); ++i) {
             GameTreeNode tmp(*m_table, !m_minmax_bool);
-            tmp.playPosition(*it1);
-            tmp.buildTree(--_level);
+            tmp.playPosition(m_positions[i]);
+            tmp.buildTree(_level-1);
             m_children.push_back(tmp);
         }
     }
-    if(_level == 0 || m_positions.empty())  //Alcanzó la profundidad deseada o ya no hay movimientos posibles
-        m_weight = m_table->weight();
     delete m_table;
 }
 
@@ -296,7 +297,7 @@ void GameTree::build(size_t _level)
     m_root->buildTree(_level);
 }
 
-Position GameTree::minMax()
+Position &GameTree::minMax()
 {
     return m_root->getPositionAt(m_root->getMaxMin());
 }
