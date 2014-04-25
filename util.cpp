@@ -61,10 +61,13 @@ void Table::check(float &_w1, float &_w2)
             for(size_t j = 0; j < m_size; ++j) {
                 if(m_table[j*m_size + i] != m_table[i])
                     break;
-                if(m_table[i] == played_me)
+                if(m_table[i] == played_me) {
+
                     _w1_aux2 = (j == m_size-1) ? 1.0 : _w1_aux2 + _step;
-                else
+                }
+                else {
                     _w2_aux2 = (j == m_size-1) ? 1.0 : _w2_aux2 + _step;
+                }
             }
             if(_w1_aux2 > _w1_aux)
                 _w1_aux = _w1_aux2;
@@ -171,9 +174,9 @@ float Table::weight()
 
 GameTreeNode::GameTreeNode(Table &_table, bool _minMax) :
     m_table(0),
+    m_positions(new vector<Position>),
     m_weight(0),
-    m_minmax_bool(_minMax),
-    m_positions(new vector<Position>)
+    m_minmax_bool(_minMax)
 {
     m_table = new Table(_table);
 }
@@ -195,14 +198,14 @@ GameTreeNode::~GameTreeNode()
     }
 }
 
-void GameTreeNode::buildTree(size_t _level)
+void GameTreeNode::buildTree(size_t _level, bool _notRoot)
 {
     m_table->availablePositions(*m_positions);
     if(_level == 0 || m_positions->empty()) { //Alcanzó la profundidad deseada o ya no hay movimientos posibles
 //        if(m_positions.empty())
 //            cout << "No más movimientos disponibles" << endl; ////*********DEBUG*********////
         m_weight = m_table->weight();
-//        cout << "Peso: " << m_weight << endl; ////*********DEBUG*********////
+        cout << "Peso: " << m_weight << endl; ////*********DEBUG*********////
         return;
     }
     if(_level > 0) {
@@ -227,6 +230,10 @@ void GameTreeNode::buildTree(size_t _level)
     }
 //    cout << "Antes del delete en nivel: " << _level << endl; ////*********DEBUG*********////
     delete m_table;
+    if(_notRoot && m_positions) {
+        delete m_positions;
+        m_positions = NULL;
+    }
 //    cout << "Después del delete" << endl; ////*********DEBUG*********////
 }
 
@@ -284,7 +291,7 @@ GameTree::~GameTree()
 void GameTree::build(size_t _level)
 {
 //    cout << "Build Tree" << _level << endl; ////*********DEBUG*********////
-    m_root->buildTree(_level);
+    m_root->buildTree(_level, false);
 //    cout << "End build tree" << _level << endl; ////*********DEBUG*********////
 }
 

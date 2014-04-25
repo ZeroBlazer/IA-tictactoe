@@ -45,7 +45,7 @@ class GameTreeNode {
 public:
     GameTreeNode(Table &_table, bool _minMax = true);
     ~GameTreeNode();
-    void buildTree(size_t _level);
+    void buildTree(size_t _level, bool _notRoot = true);
     void playPosition(Position &_pos);
     Position &getPositionAt(size_t _pos);
     size_t getMaxMin(); //Devuelve la posición con mayor/menor valor
@@ -63,6 +63,7 @@ public:
     ~GameTree();
     void build(size_t _level);
     Position &minMax();
+
 private:
     GameTreeNode *m_root;
 };
