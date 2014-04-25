@@ -221,7 +221,7 @@ float Table::weight()
 {
     float w1, w2;
     check(w1, w2);
-    return 2*w1-3*w2;
+    return (w1-w2)*w1*w1-w2*w2-w2;
 }
 
 GameTreeNode::GameTreeNode(Table &_table, bool _minMax) :
