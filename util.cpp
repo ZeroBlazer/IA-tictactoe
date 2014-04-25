@@ -133,26 +133,33 @@ int Table::weight()
 GameTreeNode::GameTreeNode(Table &_table, bool _minMax) :
     m_table(0),
     m_weight(0),
-    m_minmax_bool(_minMax)
+    m_minmax_bool(_minMax),
+    m_positions(new vector<Position>)
 {
     m_table = new Table(_table);
 }
 
 GameTreeNode::~GameTreeNode()
 {
+    if(m_positions) {
+        delete m_positions;
+        m_positions = NULL;
+    }
     for(vector<GameTreeNode*>::iterator it = m_children.begin();
         it != m_children.end();
         ++it) {
         delete (*it);
     }
-    if(m_table)
+    if(m_table) {
         delete m_table;
+        m_table = NULL;
+    }
 }
 
 void GameTreeNode::buildTree(size_t _level)
 {
-    m_table->availablePositions(m_positions);
-    if(_level == 0 || m_positions.empty()) { //Alcanzó la profundidad deseada o ya no hay movimientos posibles
+    m_table->availablePositions(*m_positions);
+    if(_level == 0 || m_positions->empty()) { //Alcanzó la profundidad deseada o ya no hay movimientos posibles
 //        if(m_positions.empty())
 //            cout << "No más movimientos disponibles" << endl; ////*********DEBUG*********////
         m_weight = m_table->weight();
@@ -169,9 +176,9 @@ void GameTreeNode::buildTree(size_t _level)
 //        cout << "}" << endl;
 //        ////*********DEBUG*********////
         GameTreeNode *tmp;
-        for(size_t i = 0; i < m_positions.size(); ++i) {
+        for(size_t i = 0; i < m_positions->size(); ++i) {
             tmp = new GameTreeNode(*m_table, !m_minmax_bool);
-            tmp->playPosition(m_positions[i]);
+            tmp->playPosition((*m_positions)[i]);
             tmp->buildTree(_level-1);
 //            cout << "Árbol construido" << endl; ////*********DEBUG*********////
             m_children.push_back(tmp);
@@ -191,11 +198,10 @@ void GameTreeNode::playPosition(Position &_pos)
 
 Position &GameTreeNode::getPositionAt(size_t _pos)
 {
-    if(_pos < m_positions.size())
-        return m_positions[_pos];
+    if(_pos < m_positions->size())
+        return (*m_positions)[_pos];
     cout << "No finalizó" << endl; ////*********DEBUG*********////
-    return m_positions[0];  //MEJOR LANZAR EXCEPCIÓN
-
+    return (*m_positions)[0];  //MEJOR LANZAR EXCEPCIÓN
 }
 
 size_t GameTreeNode::getMaxMin()
@@ -209,18 +215,18 @@ size_t GameTreeNode::getMaxMin()
     for(size_t i = 1; i < m_children.size(); ++i) {
         m_children[i]->getMaxMin();
         tmp1 = m_children[i]->m_weight;
-        if(m_minmax_bool) {
+//        if(m_minmax_bool) {
             if(tmp1 > tmp0) {
                 tmp0 = tmp1;
                 pos = i;
             }
-        }
-        else {
-            if(tmp1 < tmp0) {
-                tmp0 = tmp1;
-                pos = i;
-            }
-        }
+//        }
+//        else {
+//            if(tmp1 < tmp0) {
+//                tmp0 = tmp1;
+//                pos = i;
+//            }
+//        }
     }
     m_weight = tmp0;
     return pos;

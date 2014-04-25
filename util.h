@@ -51,7 +51,7 @@ public:
     size_t getMaxMin(); //Devuelve la posición con mayor/menor valor
 private:
     Table *m_table;
-    vector<Position> m_positions;
+    vector<Position> *m_positions;
     vector<GameTreeNode*> m_children;
     int m_weight;
     bool m_minmax_bool; //True -> Max, False -> Min
