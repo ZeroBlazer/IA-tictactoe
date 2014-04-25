@@ -52,6 +52,8 @@ void Table::check(float &_w1, float &_w2)
     float   _step = 1.0 / m_size,
             _w1_aux, _w1_aux2,
             _w2_aux, _w2_aux2;
+    int     _n_w1 = 0,
+            _n_w2 = 0;
 
     //Verificar columnas completas
     _w1_aux = _w2_aux = 0.0;
@@ -62,11 +64,20 @@ void Table::check(float &_w1, float &_w2)
                 if(m_table[j*m_size + i] != m_table[i])
                     break;
                 if(m_table[i] == played_me) {
-
-                    _w1_aux2 = (j == m_size-1) ? 1.0 : _w1_aux2 + _step;
+                    if(j == m_size-1) {
+                        _w1_aux2 = 1.0;
+                        _n_w1++;
+                    }
+                    else
+                        _w1_aux2 += _step;
                 }
                 else {
-                    _w2_aux2 = (j == m_size-1) ? 1.0 : _w2_aux2 + _step;
+                    if(j == m_size-1) {
+                        _w2_aux2 = 1.0;
+                        _n_w2++;
+                    }
+                    else
+                        _w2_aux2 += _step;
                 }
             }
             if(_w1_aux2 > _w1_aux)
@@ -88,10 +99,22 @@ void Table::check(float &_w1, float &_w2)
             for(size_t i = 0; i < m_size; ++i) {
                 if(m_table[j*m_size + i] != m_table[j*m_size])
                     break;
-                if(m_table[j*m_size] == played_me)
-                    _w1_aux2 = (i == m_size-1) ? 1.0 : _w1_aux2 + _step;
-                else
-                    _w2_aux2 = (i == m_size-1) ? 1.0 : _w2_aux2 + _step;
+                if(m_table[j*m_size] == played_me) {
+                    if(i == m_size-1) {
+                        _w1_aux2 = 1.0;
+                        _n_w1++;
+                    }
+                    else
+                        _w1_aux2 += _step;
+                }
+                else {
+                    if(i == m_size-1) {
+                        _w2_aux2 = 1.0;
+                        _n_w2++;
+                    }
+                    else
+                        _w2_aux2 += _step;
+                }
             }
             if(_w1_aux2 > _w1_aux)
                 _w1_aux = _w1_aux2;
@@ -111,10 +134,22 @@ void Table::check(float &_w1, float &_w2)
         for(size_t i = 1; i < m_size; ++i){
             if(m_table[i*m_size+i] != m_table[0])
                 break;
-            if(m_table[0] == played_me)
-                _w1_aux2 = (i == m_size-1) ? 1.0 : _w1_aux2 + _step;
-            else
-                _w2_aux2 = (i == m_size-1) ? 1.0 : _w2_aux2 + _step;
+            if(m_table[0] == played_me) {
+                if(i == m_size-1) {
+                    _w1_aux2 = 1.0;
+                    _n_w1++;
+                }
+                else
+                    _w1_aux2 += _step;
+            }
+            else {
+                if(i == m_size-1) {
+                    _w2_aux2 = 1.0;
+                    _n_w2++;
+                }
+                else
+                    _w2_aux2 += _step;
+            }
         }
         if(_w1_aux2 > _w1_aux)
             _w1_aux = _w1_aux2;
@@ -134,10 +169,22 @@ void Table::check(float &_w1, float &_w2)
         for(size_t i = 1; i < m_size; ++i) {
             if(m_table[i*m_size + _edge-i] != m_table[_edge])
                 break;
-            if(m_table[_edge] == played_me)
-                _w1_aux2 = (i == _edge) ? 1.0 : _w1_aux2 + _step;
-            else
-                _w2_aux2 = (i == _edge) ? 1.0 : _w2_aux2 + _step;
+            if(m_table[_edge] == played_me) {
+                if(i == _edge) {
+                    _w1_aux2 = 1.0;
+                    _n_w1++;
+                }
+                else
+                    _w1_aux2 += _step;
+            }
+            else {
+                if(i == _edge) {
+                    _w2_aux2 = 1.0;
+                    _n_w2++;
+                }
+                else
+                    _w2_aux2 += _step;
+            }
         }
         if(_w1_aux2 > _w1_aux)
             _w1_aux = _w1_aux2;
@@ -148,6 +195,11 @@ void Table::check(float &_w1, float &_w2)
         _w1 = _w1_aux;
     if(_w2_aux > _w2)
         _w2 = _w2_aux;
+
+    if(_w1 == 1.0)
+        _w1 *= _n_w1;
+    if(_w2 == 1.0)
+        _w2 *= _n_w2;
 }
 
 void Table::availablePositions(vector<Position> &_pos)
