@@ -52,7 +52,7 @@ public:
 private:
     Table *m_table;
     vector<Position> m_positions;
-    vector<GameTreeNode> m_children;
+    vector<GameTreeNode*> m_children;
     int m_weight;
     bool m_minmax_bool; //True -> Max, False -> Min
 };
@@ -71,8 +71,7 @@ class Game {
 public:
     Game(bool _start_me = 0, size_t _n = 3);
     void play(Position &_pos);
-    Position &bestPlay();
-    void playBestPlay();
+    void bestPlay(size_t _sizeOfTree = 3);
     status checkWinner(); //Debe retornar status, por lo pronto mostrar en consola
     void draw();
 
