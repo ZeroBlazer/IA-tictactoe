@@ -50,21 +50,26 @@ void Table::check(float &_w1, float &_w2)
 {
     _w1 = _w2 = 0.0;
     float   _step = 1.0 / m_size,
-            _w1_aux,
-            _w2_aux;
+            _w1_aux, _w1_aux2,
+            _w2_aux, _w2_aux2;
 
     //Verificar columnas completas
     _w1_aux = _w2_aux = 0.0;
     for(size_t i = 0; i < m_size; ++i) {
         if(m_table[i] != unplayed) {
+            _w1_aux2 = _w2_aux2 = 0.0;
             for(size_t j = 0; j < m_size; ++j) {
                 if(m_table[j*m_size + i] != m_table[i])
                     break;
                 if(m_table[i] == played_me)
-                    _w1_aux = (j == m_size-1) ? 1.0 : _w1_aux + _step;
+                    _w1_aux2 = (j == m_size-1) ? 1.0 : _w1_aux2 + _step;
                 else
-                    _w2_aux = (j == m_size-1) ? 1.0 : _w2_aux + _step;
+                    _w2_aux2 = (j == m_size-1) ? 1.0 : _w2_aux2 + _step;
             }
+            if(_w1_aux2 > _w1_aux)
+                _w1_aux = _w1_aux2;
+            if(_w2_aux2 > _w2_aux)
+                _w2_aux = _w2_aux2;
         }
     }
     if(_w1_aux > _w1)
@@ -76,14 +81,19 @@ void Table::check(float &_w1, float &_w2)
     _w1_aux = _w2_aux = 0.0;
     for(size_t j = 0; j < m_size; ++j) {
         if(m_table[j*m_size] != unplayed) {
+            _w1_aux2 = _w2_aux2 = 0.0;
             for(size_t i = 0; i < m_size; ++i) {
                 if(m_table[j*m_size + i] != m_table[j*m_size])
                     break;
                 if(m_table[j*m_size] == played_me)
-                    _w1_aux = (i == m_size-1) ? 1.0 : _w1_aux + _step;
+                    _w1_aux2 = (i == m_size-1) ? 1.0 : _w1_aux2 + _step;
                 else
-                    _w2_aux = (i == m_size-1) ? 1.0 : _w2_aux + _step;
+                    _w2_aux2 = (i == m_size-1) ? 1.0 : _w2_aux2 + _step;
             }
+            if(_w1_aux2 > _w1_aux)
+                _w1_aux = _w1_aux2;
+            if(_w2_aux2 > _w2_aux)
+                _w2_aux = _w2_aux2;
         }
     }
     if(_w1_aux > _w1)
@@ -94,14 +104,19 @@ void Table::check(float &_w1, float &_w2)
     //Verificar primera diagonal
     _w1_aux = _w2_aux = 0.0;
     if(m_table[0] != unplayed) {
+        _w1_aux2 = _w2_aux2 = 0.0;
         for(size_t i = 1; i < m_size; ++i){
             if(m_table[i*m_size+i] != m_table[0])
                 break;
             if(m_table[0] == played_me)
-                _w1_aux = (i == m_size-1) ? 1.0 : _w1_aux + _step;
+                _w1_aux2 = (i == m_size-1) ? 1.0 : _w1_aux2 + _step;
             else
-                _w2_aux = (i == m_size-1) ? 1.0 : _w2_aux + _step;
+                _w2_aux2 = (i == m_size-1) ? 1.0 : _w2_aux2 + _step;
         }
+        if(_w1_aux2 > _w1_aux)
+            _w1_aux = _w1_aux2;
+        if(_w2_aux2 > _w2_aux)
+            _w2_aux = _w2_aux2;
     }
     if(_w1_aux > _w1)
         _w1 = _w1_aux;
@@ -112,14 +127,19 @@ void Table::check(float &_w1, float &_w2)
     _w1_aux = _w2_aux = 0.0;
     size_t _edge = m_size-1;
     if(m_table[_edge] != unplayed) {
+        _w1_aux2 = _w2_aux2 = 0.0;
         for(size_t i = 1; i < m_size; ++i) {
             if(m_table[i*m_size + _edge-i] != m_table[_edge])
                 break;
             if(m_table[_edge] == played_me)
-                _w1_aux = (i == _edge) ? 1.0 : _w1_aux + _step;
+                _w1_aux2 = (i == _edge) ? 1.0 : _w1_aux2 + _step;
             else
-                _w2_aux = (i == _edge) ? 1.0 : _w2_aux + _step;
+                _w2_aux2 = (i == _edge) ? 1.0 : _w2_aux2 + _step;
         }
+        if(_w1_aux2 > _w1_aux)
+            _w1_aux = _w1_aux2;
+        if(_w2_aux2 > _w2_aux)
+            _w2_aux = _w2_aux2;
     }
     if(_w1_aux > _w1)
         _w1 = _w1_aux;
@@ -182,7 +202,7 @@ void GameTreeNode::buildTree(size_t _level)
 //        if(m_positions.empty())
 //            cout << "No más movimientos disponibles" << endl; ////*********DEBUG*********////
         m_weight = m_table->weight();
-        cout << "Peso: " << m_weight << endl; ////*********DEBUG*********////
+//        cout << "Peso: " << m_weight << endl; ////*********DEBUG*********////
         return;
     }
     if(_level > 0) {
@@ -234,18 +254,18 @@ size_t GameTreeNode::getMaxMin()
     for(size_t i = 1; i < m_children.size(); ++i) {
         m_children[i]->getMaxMin();
         tmp1 = m_children[i]->m_weight;
-//        if(m_minmax_bool) {
+        if(m_minmax_bool) {
             if(tmp1 > tmp0) {
                 tmp0 = tmp1;
                 pos = i;
             }
-//        }
-//        else {
-//            if(tmp1 < tmp0) {
-//                tmp0 = tmp1;
-//                pos = i;
-//            }
-//        }
+        }
+        else {
+            if(tmp1 < tmp0) {
+                tmp0 = tmp1;
+                pos = i;
+            }
+        }
     }
     m_weight = tmp0;
     return pos;
@@ -317,9 +337,9 @@ status Game::checkWinner()
     float   w1,
             w2;
     m_gameTable.check(w1, w2);
-    if(w1)
+    if(w1 >= 1.0)
         return played_me;
-    if(w2)
+    if(w2 >= 1.0)
         return played_op;
     return unplayed;
 }
