@@ -31,9 +31,9 @@ public:
     Table(Table &other);
 
     bool marcar(Position _pt);   //True si la casilla estaba libre
-    void check(size_t &_w1, size_t &_w2);   //nRaya completos: _w1 -> míos, _w2 -> oponente
+    void check(float &_w1, float &_w2);   //nRaya completos: _w1 -> míos, _w2 -> oponente
     void availablePositions(vector<Position> &_pos); //_pos se vacía y se llena con posiciones disponibles
-    int weight();
+    float weight();
 
 private:
     bool m_turn;    //Indicador del jugador al que le corresponde el turno (0: yo, 1: oponente)
@@ -53,7 +53,7 @@ private:
     Table *m_table;
     vector<Position> *m_positions;
     vector<GameTreeNode*> m_children;
-    int m_weight;
+    float m_weight;
     bool m_minmax_bool; //True -> Max, False -> Min
 };
 

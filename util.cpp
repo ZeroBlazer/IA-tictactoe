@@ -46,66 +46,85 @@ bool Table::marcar(Position _pt)
     return true;
 }
 
-void Table::check(size_t &_w1, size_t &_w2)
+void Table::check(float &_w1, float &_w2)
 {
-    _w1 = _w2 = 0;
+    _w1 = _w2 = 0.0;
+    float   _step = 1.0 / m_size,
+            _w1_aux,
+            _w2_aux;
+
     //Verificar columnas completas
+    _w1_aux = _w2_aux = 0.0;
     for(size_t i = 0; i < m_size; ++i) {
         if(m_table[i] != unplayed) {
             for(size_t j = 0; j < m_size; ++j) {
                 if(m_table[j*m_size + i] != m_table[i])
                     break;
-                if(j == m_size-1) {
-                    if(m_table[i] == played_me)
-                        ++_w1;
-                    else
-                        ++_w2;
-                }
+                if(m_table[i] == played_me)
+                    _w1_aux = (j == m_size-1) ? 1.0 : _w1_aux + _step;
+                else
+                    _w2_aux = (j == m_size-1) ? 1.0 : _w2_aux + _step;
             }
         }
     }
+    if(_w1_aux > _w1)
+        _w1 = _w1_aux;
+    if(_w2_aux > _w2)
+        _w2 = _w2_aux;
+
     //Verificar filas completas
+    _w1_aux = _w2_aux = 0.0;
     for(size_t j = 0; j < m_size; ++j) {
         if(m_table[j*m_size] != unplayed) {
             for(size_t i = 0; i < m_size; ++i) {
                 if(m_table[j*m_size + i] != m_table[j*m_size])
                     break;
-                if(i == m_size-1) {
-                    if(m_table[j*m_size] == played_me)
-                        ++_w1;
-                    else
-                        ++_w2;
-                }
+                if(m_table[j*m_size] == played_me)
+                    _w1_aux = (i == m_size-1) ? 1.0 : _w1_aux + _step;
+                else
+                    _w2_aux = (i == m_size-1) ? 1.0 : _w2_aux + _step;
             }
         }
     }
+    if(_w1_aux > _w1)
+        _w1 = _w1_aux;
+    if(_w2_aux > _w2)
+        _w2 = _w2_aux;
+
     //Verificar primera diagonal
+    _w1_aux = _w2_aux = 0.0;
     if(m_table[0] != unplayed) {
         for(size_t i = 1; i < m_size; ++i){
             if(m_table[i*m_size+i] != m_table[0])
                 break;
-            if(i == m_size-1) {
-                if(m_table[0] == played_me)
-                    ++_w1;
-                else
-                    ++_w2;
-            }
+            if(m_table[0] == played_me)
+                _w1_aux = (i == m_size-1) ? 1.0 : _w1_aux + _step;
+            else
+                _w2_aux = (i == m_size-1) ? 1.0 : _w2_aux + _step;
         }
     }
+    if(_w1_aux > _w1)
+        _w1 = _w1_aux;
+    if(_w2_aux > _w2)
+        _w2 = _w2_aux;
+
     //Verificar segunda diagonal
+    _w1_aux = _w2_aux = 0.0;
     size_t _edge = m_size-1;
     if(m_table[_edge] != unplayed) {
         for(size_t i = 1; i < m_size; ++i) {
             if(m_table[i*m_size + _edge-i] != m_table[_edge])
                 break;
-            if(i == _edge) {
-                if(m_table[_edge] == played_me)
-                    ++_w1;
-                else
-                    ++_w2;
-            }
+            if(m_table[_edge] == played_me)
+                _w1_aux = (i == _edge) ? 1.0 : _w1_aux + _step;
+            else
+                _w2_aux = (i == _edge) ? 1.0 : _w2_aux + _step;
         }
     }
+    if(_w1_aux > _w1)
+        _w1 = _w1_aux;
+    if(_w2_aux > _w2)
+        _w2 = _w2_aux;
 }
 
 void Table::availablePositions(vector<Position> &_pos)
@@ -123,9 +142,9 @@ void Table::availablePositions(vector<Position> &_pos)
     }
 }
 
-int Table::weight()
+float Table::weight()
 {
-    size_t w1, w2;
+    float w1, w2;
     check(w1, w2);
     return 2*w1-3*w2;
 }
@@ -163,7 +182,7 @@ void GameTreeNode::buildTree(size_t _level)
 //        if(m_positions.empty())
 //            cout << "No más movimientos disponibles" << endl; ////*********DEBUG*********////
         m_weight = m_table->weight();
-//        cout << "Peso: " << m_weight << endl; ////*********DEBUG*********////
+        cout << "Peso: " << m_weight << endl; ////*********DEBUG*********////
         return;
     }
     if(_level > 0) {
@@ -295,7 +314,7 @@ void Game::bestPlay(size_t _sizeOfTree)
 
 status Game::checkWinner()
 {
-    size_t  w1,
+    float   w1,
             w2;
     m_gameTable.check(w1, w2);
     if(w1)
